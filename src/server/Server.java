@@ -12,18 +12,24 @@ public class Server {
 
     private void run() {
 
-        ServerSocket serverSocket = null;
+        //initialize the server socket
+        ServerSocket serverSocket;
 
-        try {
-            serverSocket = new ServerSocket(3000);
+        //try to connect to the server socket at socket 3000
+        while (true) {
+            try {
+                serverSocket = new ServerSocket(3000);
 
-            while(true) {
+                //continually check for client connections
                 Socket socket = serverSocket.accept();
                 ClientThread clientThread = new ClientThread(socket);
                 clientThread.start();
+
+                System.out.println("client connected");
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

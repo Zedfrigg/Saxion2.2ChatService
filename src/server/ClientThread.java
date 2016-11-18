@@ -18,7 +18,5 @@ public class ClientThread extends Thread {
 				running = false;
 			}
 		}
-		
-		
     }
 }

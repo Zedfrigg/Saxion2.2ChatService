@@ -3,51 +3,46 @@ package server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Server {
+	
+	private static final int LISTENING_PORT = 3000;
+	
     public static void main(String[] args) {
-        Server server = new Server();
-        server.run();
+		
+        new Server().run();
     }
 
     private void run() {
-
-        //initialize the server socket
-        ServerSocket serverSocket = null;
+		
+		ServerSocket serverSocket = null;
 
         try {
-            serverSocket = new ServerSocket(3000);
+            serverSocket = new ServerSocket(LISTENING_PORT);
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //try to connect to the server socket at socket 3000
+			System.out.println("Couldn't create server socket");
+			System.exit(1);
+		}
+		
         while (true) {
             try {
-
-                //continually check for client connections
+				
+                // continually check for client connections
                 Socket socket = serverSocket.accept();
 
-                //set up input/output stream
-                InputStream inputStream = socket.getInputStream();
-                OutputStream outputStream = socket.getOutputStream();
-
-                //start the client thread
+                // start the client thread and add it to the list
                 ClientThread clientThread = new ClientThread(socket);
-                clientThread.start();
+				// TODO: add a way to identify client threads / connections
+				clientThread.start();
 
-                System.out.println("client connected");
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                while (true) {
-                    String line = reader.readLine();
-                    System.out.println(line);
-                }
+                System.out.println("Client connected from: " + socket.getRemoteSocketAddress());
 
             } catch (IOException e) {
-                e.printStackTrace();
-            }
+				System.out.println("Problem with socket");
+			}
         }
     }
 }

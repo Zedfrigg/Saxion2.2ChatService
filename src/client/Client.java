@@ -29,31 +29,33 @@ public class Client {
 				socket = new Socket(CONNECT_ADDRESS, CONNECT_PORT);
 				running = false;
 			} catch (IOException e) {
-				System.out.println("Couldn't connect to server, try again? [y/n]");
+				System.out.print("[CONN]\tCouldn't connect to server, try again? [y/n] ");
 				if (scanner.nextLine().equalsIgnoreCase("n")) {
 					System.exit(0);
 				}
 			}
 		}
+		
+		ReceiveThread receiveThread = new ReceiveThread(socket);
+		receiveThread.start();
 	
+		OutputStream outputStream = null;
+		
 		try {
-
-			InputStream inputStream = socket.getInputStream();
-			OutputStream outputStream = socket.getOutputStream();
-			
-			//send a line of text
-			PrintWriter writer = new PrintWriter(outputStream);
-
-			while (true) {
-				System.out.print("> ");
-				writer.println(scanner.nextLine());
-				writer.flush();
-				
-				// TODO: check if message was delivered / if server is still reachable
-			}
-			
+			outputStream = socket.getOutputStream();
 		} catch (IOException e) {
-			System.out.println("Couldn't get streams");
+			System.out.println("[CONN]\tCouldn't get output stream");
+			System.exit(1);
+		}
+		
+		PrintWriter writer = new PrintWriter(outputStream);
+	
+		while (true) {
+			System.out.print("       you | ");
+			writer.println(scanner.nextLine());
+			writer.flush();
+		
+			// TODO: check if message was delivered / if server is still reachable
 		}
     }
 }

@@ -4,8 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 public class Server {
 	
@@ -22,26 +21,31 @@ public class Server {
 
         try {
             serverSocket = new ServerSocket(LISTENING_PORT);
-        } catch (IOException e) {
-			System.out.println("Couldn't create server socket");
+			System.out.println("[CONN]\tListening on port " + LISTENING_PORT);
+		} catch (IOException e) {
+			System.out.println("[CONN]\tCouldn't create server socket");
 			System.exit(1);
 		}
+		
+		final List<Socket> clientSocketList = new ArrayList<>();
 		
         while (true) {
             try {
 				
-                // continually check for client connections
+                // Continually check for client connections
                 Socket socket = serverSocket.accept();
 
-                // start the client thread and add it to the list
-                ClientThread clientThread = new ClientThread(socket);
+                // Start a client thread and add the socket to the list
+                ReceiveThread receiveThread = new ReceiveThread(socket, clientSocketList);
+				clientSocketList.add(socket);
 				// TODO: add a way to identify client threads / connections
-				clientThread.start();
+				receiveThread.start();
 
-                System.out.println("Client connected from: " + socket.getRemoteSocketAddress());
+                System.out.println("[CONN]\tClient connected from: " + socket.getRemoteSocketAddress());
 
             } catch (IOException e) {
-				System.out.println("Problem with socket");
+				System.out.println("[CONN]\tProblem with socket");
+				System.exit(1);
 			}
         }
     }
